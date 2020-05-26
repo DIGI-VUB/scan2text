@@ -200,6 +200,7 @@ server <- function(input, output, session) {
     }
   })
   observeEvent(input$ui_page_previous, {
+    content <- image_content()
     if(!content$failed){
       if(pagenumber() > 1){
         pagenumber(pagenumber() - 1)  
