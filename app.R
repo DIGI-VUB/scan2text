@@ -254,7 +254,7 @@ server <- function(input, output, session) {
               img <- image_crop(content$img, geometry = crop)
               tesseract::ocr(img, engine = tesseract::tesseract(input$ui_ocr_language), HOCR = FALSE)
             })
-            showModal(modalDialog(title = "OCR", tail(x$text, n = 1), footer=NULL, easyClose = TRUE))
+            showModal(modalDialog(title = "OCR", tail(x$text, n = 1), easyClose = TRUE))
           }
         }
         results[[content$file_basename]][[content$page]] <- x
