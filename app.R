@@ -258,7 +258,7 @@ server <- function(input, output, session) {
             showModal(modalDialog(title = "OCR", tail(x$text, n = 1), easyClose = TRUE))
           }
         }
-        results[[content$file_basename]][[content$page]] <- x
+        results[[content$file_basename]][[content$page]] <<- x
         saveDB(results, path = content$file_results)
         x
       }
