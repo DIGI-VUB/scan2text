@@ -29,6 +29,8 @@ Either
 ![](example/example.gif)
 
 
+- Selected areas from the images or pdf files and the optionally extracted text contained in these areas are saved in de www folder of your current directory
+
 ### DIGI
 
 By DIGI: Brussels Platform for Digital Humanities: https://digi.research.vub.be
