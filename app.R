@@ -25,7 +25,7 @@ body <- dashboardBody(
     $(document).ready(function() {
        // define options to pass to bounding box constructor
         var options = {
-          url: "https://raw.githubusercontent.com/DIGI-VUB/scan2text/master/example.png",
+          url: "https://raw.githubusercontent.com/DIGI-VUB/scan2text/master/example/example.png",
           input_method: "select", 
           labels: [""],
           color_list:  [""], 
@@ -146,7 +146,7 @@ server <- function(input, output, session) {
   
   volumes <- c(CURRENT_DIRECTORY = getwd(), UP = "..", USER_FOLDER = Sys.getenv("USERPROFILE"), HOME = "")
   shinyFiles::shinyFileChoose(input, id = 'fileSelect', roots = volumes, session = session)
-  getSelectedFile <- function(inputui, default = "https://raw.githubusercontent.com/DIGI-VUB/scan2text/master/example.png"){
+  getSelectedFile <- function(inputui, default = "https://raw.githubusercontent.com/DIGI-VUB/scan2text/master/example/example.png"){
     f <- shinyFiles::parseFilePaths(volumes, inputui)
     f <- as.character(f$datapath)
     if(length(f) == 0){
