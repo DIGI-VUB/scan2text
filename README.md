@@ -18,6 +18,11 @@ install.packages("tesseract")
 install.packages("digest")
 ```
 
+This uses R package `pdftools` to convert pdf files into png files. 
+- On Mac OS this requires you to install Ghostscript (e.g. as indicated at http://macappstore.org/ghostscript using Homebrew). 
+- On Linux this probably means installing Poppler as indicated at https://CRAN.R-project.org/package=pdftools
+- On Windows you are probably safe as is
+
 ### Usage
 
 Either
