@@ -108,10 +108,13 @@ body <- dashboardBody(
                  actionButton(inputId = "ui_page_previous", label = "Previous page", icon = icon("angle-double-left"))  
                )
            ),
-           box(title = "Restart", width = NULL, status = "danger",
+           box(title = "Reset", width = NULL, status = "danger",
                div(
-                 tags$button(id = "reset_button", type = "reset", class = "btn btn-default action-button", "Reset selections")
+                 tags$button(id = "reset_button", type = "reset", class = "btn btn-default action-button", "Reset all selections of page")
                )
+           ),
+           box(title = "Download results", width = NULL, status = "success",
+               downloadButton(outputId = "ui_downloadresults_csv", label = "Download your work in .csv")
            ),
            box(title = "Perform Optical Character Recognition", width = NULL, status = "danger",
                checkboxInput(inputId = "ui_ocr_yes", label = "Perform OCR", value = TRUE),
@@ -131,14 +134,16 @@ ui <- dashboardPage(
   body
 )
 server <- function(input, output, session) {
-  saveDB <- function(x, path){
+  saveDB <- function(x, path, store = TRUE){
     x <- lapply(x, FUN=function(x){
       rbindlist(x, use.names = TRUE, fill = TRUE, idcol = "page")
     })
     x <- rbindlist(x, use.names = TRUE, fill = TRUE, idcol = "file")
-    if(nrow(x) > 0){
-      write.csv(x, file = path, na = "", row.names = FALSE) 
+    x <- setDF(x)
+    if(nrow(x) > 0 && store == TRUE){
+      write.csv2(x, file = path, na = "", row.names = FALSE) 
     }
+    invisible(x)
   }
   results <- list()
   session$sendCustomMessage("update-category-list", list("orange" = "new text chunk", "pink" = "continuing text chunk"))
@@ -258,7 +263,7 @@ server <- function(input, output, session) {
             showModal(modalDialog(title = "OCR", tail(x$text, n = 1), easyClose = TRUE))
           }
         }
-        results[[content$file_basename]][[content$page]] <- x
+        results[[content$file_basename]][[content$page]] <<- x
         saveDB(results, path = content$file_results)
         x
       }
@@ -271,10 +276,17 @@ server <- function(input, output, session) {
       content <- image_content()
     })
     if(!content$failed){
-      results[[content$file_basename]][[pagenumber()]] <- NULL
+      results[[content$file_basename]][[pagenumber()]] <<- NULL
       saveDB(results, path = content$file_results)  
     }
-    
   })
+  output$ui_downloadresults_csv <- downloadHandler(
+    filename = function() {
+      sprintf("scan2text_%s.csv", format(Sys.time(), "%Y%m%d_%H%M%S"))
+    },
+    content = function(filename) {
+      saveDB(results, path = filename)  
+    }, contentType = "text/csv")
+  
 }
 shinyApp(ui, server)
