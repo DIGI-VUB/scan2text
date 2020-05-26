@@ -20,6 +20,12 @@ install.packages("digest")
 
 ### Usage
 
+Either
+
+- If you downloaded this repository just run `shiny::runApp("app.R")` to launch the Shiny application
+- If you did not download this repository just run `shiny::runGitHub("DIGI-VUB/scan2text")` to launch the Shiny application
+- Or in RStudio open the file `app.R` and press the `> Run App` button
+
 ![](example/example.gif)
 
 
