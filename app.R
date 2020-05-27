@@ -168,16 +168,20 @@ server <- function(input, output, session) {
     if(length(x) == 0){
       out <- list(failed = TRUE)
     }else{
-      showModal(modalDialog("Reading data, please wait", easyClose = FALSE))
+      showModal(modalDialog("Reading data, please wait. This popup will close automatically when this is finished.", easyClose = FALSE, footer = NULL))
       ## read in the data
-      img <- image_read(x)
+      ok <- try(img <- image_read(x))
+      removeModal()
+      if(inherits(ok, "try-error")){
+        showModal(modalDialog(sprintf("Could not read file: %s. Is this file an image or a pdf file?", basename(x))))
+      }
       ## define path where to store object
       www <- file.path(getwd(), "www", "appfolder")
       if(!dir.exists(www)) dir.create(www, recursive = TRUE) 
       www <- cbind(file.info(x), Sys.time())
       path <- file.path("appfolder",  sprintf("%s_%s.png", digest::digest(www), seq_len(length(img))))
       path_full <- file.path(getwd(), "www", path)
-      removeModal()
+      
       ## start again from page 1
       isolate({
         pagenumber(1)
@@ -229,7 +233,9 @@ server <- function(input, output, session) {
       img <- content$img
       
       if(file_ext(content$file) == "pdf"){
+        showNotification("Converting pdf to png", id = "note_pdf_convert", session = session)
         f <- pdf_convert(pdf = content$file, pages = page, dpi = content$dpi, format = "png", filenames = content$p_full)  
+        removeNotification(id = "note_pdf_convert", session = session)
       }else{
         image_write(img[page], path = content$p_full, format = "png")
       }
@@ -255,11 +261,13 @@ server <- function(input, output, session) {
           content$img <- image_read(content$path_full[content$page])
           x$dpi <- content$dpi
           if(input$ui_ocr_yes){
+            showNotification("Performing OCR", id = "note_ocr", session = session)
             x$area <- sprintf("%sx%s+%s+%s", x$width, x$height, x$left, x$top)
             x$text <- sapply(x$area, FUN=function(crop){
               img <- image_crop(content$img, geometry = crop)
               tesseract::ocr(img, engine = tesseract::tesseract(input$ui_ocr_language), HOCR = FALSE)
             })
+            removeNotification(id = "note_ocr", session = session)
             showModal(modalDialog(title = "OCR", tail(x$text, n = 1), easyClose = TRUE))
           }
         }
