@@ -285,7 +285,10 @@ server <- function(input, output, session) {
       sprintf("scan2text_%s.csv", format(Sys.time(), "%Y%m%d_%H%M%S"))
     },
     content = function(filename) {
-      saveDB(results, path = filename)  
+      isolate({
+        content <- image_content()
+      })
+      file.copy(content$file_results, to = filename, overwrite = TRUE)
     }, contentType = "text/csv")
   
 }
